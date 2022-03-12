@@ -2,33 +2,42 @@ package com.code.challenge.service;
 
 import com.code.challenge.dto.EmailDto;
 import com.code.challenge.dto.PhoneNumberDto;
+import com.code.challenge.dto.UserDto;
 import com.code.challenge.entity.Email;
 import com.code.challenge.entity.PhoneNumber;
+import com.code.challenge.entity.User;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
 public class Mapper {
 
-    public Set<PhoneNumber> convertPhoneNumbersDtoToEntity(Set<PhoneNumberDto> phoneNumberDtoList) {
-        Set<PhoneNumber> phoneNumbers = new HashSet<>();
-        phoneNumberDtoList.forEach(phoneNumberDto -> phoneNumbers.add(PhoneNumber.builder().number(phoneNumberDto.getNumber()).build()));
-        return phoneNumbers;
+    public Set<PhoneNumber> convertPhoneNumbersDtoToEntity(UserDto userDto) {
+        return userDto.getPhoneNumbers().stream().map(phoneNumberDto ->
+                PhoneNumber.builder().number(phoneNumberDto.getNumber()).build()).collect(Collectors.toSet());
     }
 
-    public Set<Email> convertEmailsDtoToEntity(Set<EmailDto> emailDtos) {
-        Set<Email> emails = new HashSet<>();
-        emailDtos.forEach(emailDto -> emails.add(Email.builder().mail(emailDto.getMail()).build()));
-        return emails;
+    public Set<Email> convertEmailsDtoToEntity(UserDto userDto) {
+        return userDto.getEmails().stream().map(email -> Email.builder().mail(email.getMail()).build()).collect(Collectors.toSet());
+    }
+
+    public PhoneNumber convertPhoneNumbersDtoToEntity(PhoneNumberDto phoneNumberDto) {
+        PhoneNumber phoneNumber = new PhoneNumber();
+        phoneNumber.setNumber(phoneNumberDto.getNumber());
+        phoneNumber.setId(phoneNumber.getId());
+        return phoneNumber;
+    }
+
+    public Email convertEmailsDtoToEntity(EmailDto emailDto) {
+        Email email = new Email();
+        email.setMail(emailDto.getMail());
+        return email;
     }
 
     public Set<PhoneNumberDto> convertPhoneNumbersEntityToDto(Set<PhoneNumber> phoneNumbers) {
-        Set<PhoneNumberDto> phoneNumberDtoList = new HashSet<>();
-        phoneNumbers.forEach(phoneNumber -> phoneNumberDtoList.add(PhoneNumberDto.builder().number(phoneNumber.getNumber()).build()));
-        return phoneNumberDtoList;
+        return phoneNumbers.stream().map(phoneNumber -> PhoneNumberDto.builder().number(phoneNumber.getNumber()).build()).collect(Collectors.toSet());
     }
 
     public Set<EmailDto> convertEmailsEntityToDto(Set<Email> emails) {

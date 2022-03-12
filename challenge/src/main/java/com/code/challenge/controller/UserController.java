@@ -37,10 +37,14 @@ public class UserController {
         return new ResponseEntity<>(userService.getUserByName(firstName , lastName), HttpStatus.OK);
     }
 
-    @PutMapping(path = "/{id}")
-    public ResponseEntity<UserDto> updateUserDataMailOrPhone(@PathVariable long id, @Nullable @RequestBody EmailDto emailDto,
-                                                               @Nullable @RequestBody PhoneNumberDto phoneNumberDto){
-        return new ResponseEntity<>(userService.updateUserMailOrPhoneNo(id, emailDto, phoneNumberDto), HttpStatus.OK);
+    @PutMapping(path = "/{id}/mails")
+    public ResponseEntity<UserDto> updateUserDataMail(@PathVariable long id, @RequestBody EmailDto emailDto){
+        return new ResponseEntity<>(userService.updateUserMail(id, emailDto), HttpStatus.OK);
+    }
+
+    @PutMapping(path = "/{id}/phone-numbers")
+    public ResponseEntity<UserDto> updateUserDataPhone(@PathVariable long id,@Nullable @RequestBody PhoneNumberDto phoneNumberDto){
+        return new ResponseEntity<>(userService.updateUserPhoneNo(id, phoneNumberDto), HttpStatus.OK);
     }
 
     @DeleteMapping(path = "/{id}")
