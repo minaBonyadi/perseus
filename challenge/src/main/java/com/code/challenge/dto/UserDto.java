@@ -2,7 +2,7 @@ package com.code.challenge.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -10,6 +10,6 @@ public class UserDto {
     long id;
     String lastName;
     String firstName;
-    List<EmailDto> emails;
-    List<PhoneNumberDto> phoneNumbers;
+    Set<EmailDto> emails;
+    Set<PhoneNumberDto> phoneNumbers;
 }

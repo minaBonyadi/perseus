@@ -1,18 +1,18 @@
 package com.code.challenge.entity;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
 @Builder
 @Entity
-@Table(name = "USER")
+@Table(name = "USER", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"LAST_NAME", "FIRST_NAME"})
+})
+@AllArgsConstructor
 @NoArgsConstructor
 public class User {
     @Id
@@ -26,9 +26,9 @@ public class User {
     @Column(name = "FIRST_NAME")
     String firstName;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "mail")
-    List<Email> emails;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "user")
+    Set<Email> emails;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "number")
-    List<PhoneNumber> phoneNumbers;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "user")
+    Set<PhoneNumber> phoneNumbers;
 }

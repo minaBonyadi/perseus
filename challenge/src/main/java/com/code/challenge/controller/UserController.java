@@ -1,51 +1,50 @@
 package com.code.challenge.controller;
 
+import com.code.challenge.dto.EmailDto;
+import com.code.challenge.dto.PhoneNumberDto;
 import com.code.challenge.dto.UserDto;
 import com.code.challenge.dto.rest_response.RestResponse;
 import com.code.challenge.service.UserService;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
 @RestController
 @RequestMapping(path = "/user")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/create")
-    private ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto userDto) {
-        return new ResponseEntity<>(userService.createUser(userDto), HttpStatus.OK);
+    @PostMapping(path ="/create")
+    public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
+        return new ResponseEntity<>(userService.createUser(userDto), HttpStatus.CREATED);
     }
 
-    @GetMapping
-    @RequestMapping(path = "/getById/{id}")
-    private ResponseEntity<UserDto> getUserById(@PathVariable long id){
+    @GetMapping(path = "/{id}")
+    public ResponseEntity<UserDto> getUserById(@PathVariable long id){
         return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
     }
 
-    @GetMapping
-    @RequestMapping(path = "/getByName")
-    private ResponseEntity<UserDto> getUserByName(@RequestParam String firstName, @RequestParam String lastName){
+    @GetMapping(path = "/spec")
+    public ResponseEntity<UserDto> getUserByName(@NonNull @RequestParam String firstName, @NonNull @RequestParam String lastName){
         return new ResponseEntity<>(userService.getUserByName(firstName , lastName), HttpStatus.OK);
     }
 
-    @PostMapping
-    private void addAdditionalUserData(){
-
+    @PutMapping(path = "/{id}")
+    public ResponseEntity<UserDto> updateUserDataMailOrPhone(@PathVariable long id, @Nullable @RequestBody EmailDto emailDto,
+                                                               @Nullable @RequestBody PhoneNumberDto phoneNumberDto){
+        return new ResponseEntity<>(userService.updateUserMailOrPhoneNo(id, emailDto, phoneNumberDto), HttpStatus.OK);
     }
 
-    @PutMapping
-    private void updateUserData(){
-
-    }
-
-    @DeleteMapping
-    private void deleteUserData(){
-
+    @DeleteMapping(path = "/{id}")
+    public ResponseEntity<UserDto> deleteUser(@PathVariable long id){
+        return new ResponseEntity<>(userService.deleteUser(id), HttpStatus.OK);
     }
 }

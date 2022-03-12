@@ -1,17 +1,16 @@
 package com.code.challenge.entity;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Getter
 @Setter
 @Builder
 @Entity
 @Table(name = "EMAIL")
+@AllArgsConstructor
 @NoArgsConstructor
 public class Email {
 

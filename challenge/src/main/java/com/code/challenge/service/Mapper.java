@@ -6,34 +6,33 @@ import com.code.challenge.entity.Email;
 import com.code.challenge.entity.PhoneNumber;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class Mapper {
 
-    public List<PhoneNumber> convertPhoneNumbersDtoToEntity(List<PhoneNumberDto> phoneNumberDtoList) {
-        List<PhoneNumber> phoneNumbers = new ArrayList<>();
+    public Set<PhoneNumber> convertPhoneNumbersDtoToEntity(Set<PhoneNumberDto> phoneNumberDtoList) {
+        Set<PhoneNumber> phoneNumbers = new HashSet<>();
         phoneNumberDtoList.forEach(phoneNumberDto -> phoneNumbers.add(PhoneNumber.builder().number(phoneNumberDto.getNumber()).build()));
         return phoneNumbers;
     }
 
-    public List<Email> convertEmailsDtoToEntity(List<EmailDto> emailDtos) {
-        List<Email> emails = new ArrayList<>();
+    public Set<Email> convertEmailsDtoToEntity(Set<EmailDto> emailDtos) {
+        Set<Email> emails = new HashSet<>();
         emailDtos.forEach(emailDto -> emails.add(Email.builder().mail(emailDto.getMail()).build()));
         return emails;
     }
 
-    public List<PhoneNumberDto> convertPhoneNumbersEntityToDto(List<PhoneNumber> phoneNumbers) {
-        List<PhoneNumberDto> phoneNumberDtoList = new ArrayList<>();
+    public Set<PhoneNumberDto> convertPhoneNumbersEntityToDto(Set<PhoneNumber> phoneNumbers) {
+        Set<PhoneNumberDto> phoneNumberDtoList = new HashSet<>();
         phoneNumbers.forEach(phoneNumber -> phoneNumberDtoList.add(PhoneNumberDto.builder().number(phoneNumber.getNumber()).build()));
         return phoneNumberDtoList;
     }
 
-    public List<EmailDto> convertEmailsEntityToDto(List<Email> emails) {
-        List<EmailDto> emailDtoList = new ArrayList<>();
-        emails.forEach(email -> emailDtoList.add(EmailDto.builder().mail(email.getMail()).build()));
-        return emailDtoList;
+    public Set<EmailDto> convertEmailsEntityToDto(Set<Email> emails) {
+        return emails.stream().map(email -> EmailDto.builder().mail(email.getMail()).build()).collect(Collectors.toSet());
     }
 
 }

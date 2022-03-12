@@ -16,19 +16,9 @@ public class UserExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<RestResponse> handleNotFoundException(UserNotFoundException ex, WebRequest request) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new RestResponse(RestResponseType.ERROR, "User Not Found!"));
     }
-//
-//    @org.springframework.web.bind.annotation.ExceptionHandler(value = {MankalaOutOfBandException.class})
-//    protected ResponseEntity<RestResponse> handleOutOfBandException(MankalaOutOfBandException ex, WebRequest request) {
-//        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new RestResponse(RestResponseType.ERROR, ex.getMessage()));
-//    }
-//
-//    @org.springframework.web.bind.annotation.ExceptionHandler(value = {MankalaIsTheWrongTurnException.class})
-//    protected ResponseEntity<RestResponse> handleMakeTheWrongTurn(MankalaIsTheWrongTurnException ex, WebRequest request) {
-//        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new RestResponse(RestResponseType.WARNING, ex.getMessage()));
-//    }
-//
-//    @org.springframework.web.bind.annotation.ExceptionHandler(value = {MankalaWebException.class})
-//    protected ResponseEntity<RestResponse> handleWebException(RuntimeException ex, WebRequest request) {
-//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RestResponse(RestResponseType.WARNING, ex.getMessage()));
-//    }
+
+    @ExceptionHandler(value = {UserLogicalException.class})
+    protected ResponseEntity<RestResponse> handleOutOfBandException(UserLogicalException ex, WebRequest request) {
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new RestResponse(RestResponseType.ERROR, ex.getMessage()));
+    }
 }

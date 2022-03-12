@@ -1,11 +1,12 @@
 package com.code.challenge.repository;
 
 import com.code.challenge.entity.User;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByFirstNameAndLastName(String firstName, String lastName);
-    Optional<User> findUserByFirstName(String firstName, String lastName);
+@Repository
+public interface UserRepository extends CrudRepository<User, Long> {
+    Optional<User> findByFirstNameAndLastNameIgnoreCase(String firstName, String lastName);
 }
