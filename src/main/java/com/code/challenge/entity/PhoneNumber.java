@@ -1,6 +1,5 @@
 package com.code.challenge.entity;
 
-import jdk.jfr.Event;
 import lombok.*;
 
 import javax.persistence.*;
