@@ -26,9 +26,9 @@ public class User {
     @Column(name = "FIRST_NAME")
     String firstName;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval=true, mappedBy = "user")
     Set<Email> emails;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval=true, mappedBy = "user")
     Set<PhoneNumber> phoneNumbers;
 }

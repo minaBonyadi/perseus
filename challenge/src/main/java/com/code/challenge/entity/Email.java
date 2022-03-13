@@ -3,7 +3,6 @@ package com.code.challenge.entity;
 import lombok.*;
 
 import javax.persistence.*;
-import java.io.Serializable;
 
 @Getter
 @Setter
@@ -25,4 +24,10 @@ public class Email {
     @ManyToOne
     @JoinColumn(name = "USER_ID")
     User user;
+
+    public void deleteEmails() {
+        if (user.getEmails() != null) {
+            user.getEmails().remove(this);
+        }
+    }
 }

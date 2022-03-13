@@ -1,9 +1,9 @@
 package com.code.challenge.entity;
 
+import jdk.jfr.Event;
 import lombok.*;
 
 import javax.persistence.*;
-import java.io.Serializable;
 
 @Getter
 @Setter
@@ -24,4 +24,10 @@ public class PhoneNumber {
     @ManyToOne
     @JoinColumn(name = "USER_ID")
     User user;
+
+    public void deletePhoneNumber() {
+        if (user.getPhoneNumbers() != null) {
+            user.getPhoneNumbers().remove(this);
+        }
+    }
 }

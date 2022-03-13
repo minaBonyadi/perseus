@@ -3,6 +3,8 @@ package com.code.challenge.controller;
 import com.code.challenge.dto.EmailDto;
 import com.code.challenge.dto.PhoneNumberDto;
 import com.code.challenge.dto.UserDto;
+import com.code.challenge.dto.rest_response.RestResponse;
+import com.code.challenge.dto.rest_response.RestResponseType;
 import com.code.challenge.service.UserService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +47,7 @@ public class UserController {
     }
 
     @DeleteMapping(path = "/{id}")
-    public ResponseEntity<UserDto> deleteUser(@PathVariable long id){
+    public ResponseEntity<RestResponse> deleteUser(@PathVariable long id) {
         return new ResponseEntity<>(userService.deleteUser(id), HttpStatus.OK);
     }
 }

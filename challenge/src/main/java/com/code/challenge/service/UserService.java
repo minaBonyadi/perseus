@@ -3,11 +3,11 @@ package com.code.challenge.service;
 import com.code.challenge.dto.EmailDto;
 import com.code.challenge.dto.PhoneNumberDto;
 import com.code.challenge.dto.UserDto;
+import com.code.challenge.dto.rest_response.RestResponse;
+import com.code.challenge.dto.rest_response.RestResponseType;
 import com.code.challenge.entity.Email;
 import com.code.challenge.entity.PhoneNumber;
 import com.code.challenge.entity.User;
-import com.code.challenge.exception.EmailNotFoundException;
-import com.code.challenge.exception.PhoneNumberNotFoundException;
 import com.code.challenge.exception.UserLogicalException;
 import com.code.challenge.exception.UserNotFoundException;
 import com.code.challenge.repository.EmailRepository;
@@ -15,10 +15,12 @@ import com.code.challenge.repository.PhoneNumberRepository;
 import com.code.challenge.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -38,14 +40,18 @@ public class UserService {
         Set<Email> emails = mapper.convertEmailsDtoToEntity(userDto);
         Set<PhoneNumber> phoneNumbers = mapper.convertPhoneNumbersDtoToEntity(userDto);
 
-        User newUser = userRepository.save(User.builder()
+        User newUser = User.builder()
                     .firstName(userDto.getFirstName())
                     .lastName(userDto.getLastName())
-                    .build());
+                    .build();
 
-        emails.forEach(email -> emailRepository.save(email).setUser(newUser));
-        phoneNumbers.forEach(phoneNumber -> phoneNumberRepository.save(phoneNumber).setUser(newUser));
+        emailRepository.saveAll(emails);
+        phoneNumberRepository.saveAll(phoneNumbers);
 
+        newUser.setEmails(emails);
+        newUser.setPhoneNumbers(phoneNumbers);
+
+        userRepository.save(newUser);
         log.info("A user by this first_name [{}] and last_name [{}] has just added successfully", userDto.getFirstName(), userDto.getLastName());
 
         return UserDto.builder()
@@ -88,19 +94,20 @@ public class UserService {
         Set<Email> emails = new HashSet<>();
         Email email = mapper.convertEmailsDtoToEntity(emailDto);
 
-        if (emailDto.getId() == 0) {
+        Optional<Email> updatedEmail = emailRepository.findEmailByMail(emailDto.getMail());
+
+        if (updatedEmail.isPresent()) {
+            updatedEmail.get().setMail(emailDto.getMail());
+            emailRepository.save(updatedEmail.get());
+        }else {
             emailRepository.save(email);
             emails.add(email);
             emails.addAll(user.getEmails());
             user.setEmails(emails);
-        }else {
-            Email updatedEmail = emailRepository.findById(emailDto.getId()).orElseThrow(()-> new EmailNotFoundException("Email Not Found!"));
-            updatedEmail.setMail(emailDto.getMail());
-            emailRepository.save(updatedEmail);
         }
 
         User updatedUser = userRepository.save(user);
-        log.info("A user by this first_name [{}] and last_name [{}] has just updated successfully", user.getFirstName(), user.getLastName());
+        log.info("A user by this first_name [{}] and last_name [{}] has just added/updated successfully", user.getFirstName(), user.getLastName());
 
         return UserDto.builder()
                 .id(updatedUser.getId())
@@ -117,18 +124,16 @@ public class UserService {
         Set<PhoneNumber> phoneNumbers = new HashSet<>();
         PhoneNumber newPhoneNumber = mapper.convertPhoneNumbersDtoToEntity(phoneNumberDto);
 
-        if (phoneNumberDto.getId() == 0) {
+        Optional<PhoneNumber> updatedPhoneNo = phoneNumberRepository.findPhoneNumberByNumber(phoneNumberDto.getNumber());
 
+        if (updatedPhoneNo.isPresent()) {
+            updatedPhoneNo.get().setNumber(phoneNumberDto.getNumber());
+            phoneNumberRepository.save(updatedPhoneNo.get());
+        }else {
             phoneNumberRepository.save(newPhoneNumber);
             phoneNumbers.add(newPhoneNumber);
             phoneNumbers.addAll(user.getPhoneNumbers());
             user.setPhoneNumbers(phoneNumbers);
-
-        }else {
-            PhoneNumber updatedPhoneNo = phoneNumberRepository.findById(phoneNumberDto.getId()).orElseThrow(()->
-                    new PhoneNumberNotFoundException("Phone number Not Found!"));
-            updatedPhoneNo.setNumber(phoneNumberDto.getNumber());
-            phoneNumberRepository.save(updatedPhoneNo);
         }
 
         User updatedUser = userRepository.save(user);
@@ -144,18 +149,18 @@ public class UserService {
                 .build();
     }
 
-    public UserDto deleteUser(long id) {
+    public RestResponse deleteUser(long id) {
         User user = userRepository.findById(id).orElseThrow(()-> new UserNotFoundException("User Not Found!"));
 
+        user.getEmails().forEach(Email::deleteEmails);
+        user.getPhoneNumbers().forEach(PhoneNumber::deletePhoneNumber);
+
+        emailRepository.deleteAll(user.getEmails());
+        phoneNumberRepository.deleteAll(user.getPhoneNumbers());
         userRepository.delete(user);
+
         log.info("A user by this first_name [{}] and last_name [{}] has just deleted successfully", user.getFirstName(), user.getLastName());
 
-        return UserDto.builder()
-                .id(user.getId())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .emails(mapper.convertEmailsEntityToDto(user.getEmails()))
-                .phoneNumbers(mapper.convertPhoneNumbersEntityToDto(user.getPhoneNumbers()))
-                .build();
+        return new RestResponse(RestResponseType.SUCCESS, "deleting user done successfully!");
     }
 }
