@@ -72,6 +72,7 @@ all outputs are user dto except delete service
 
 ## Roadmap
 - add spring security
+-add swagger UI
 
 ## Authors and acknowledgment
 
