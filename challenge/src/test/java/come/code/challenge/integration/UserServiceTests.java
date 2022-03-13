@@ -274,14 +274,14 @@ class UserServiceTests {
         //************************
         //          Given
         //************************
-        sampleUser();
+        long id = sampleUser();
         //************************
         //          WHEN
         //************************
 
         UriTemplate requestTemplate = new UriTemplate("/users/{id}/phone-numbers");
         Map<String, Long> uriVariables = new HashMap<>();
-        uriVariables.put("id", 1L);
+        uriVariables.put("id", id);
 
         MvcResult responseBody = mockMvc.perform(put(requestTemplate.expand(uriVariables).toString())
                 .content("{\"number\":\"9108732165\"}")

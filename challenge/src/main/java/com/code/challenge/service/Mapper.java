@@ -44,4 +44,14 @@ public class Mapper {
         return emails.stream().map(email -> EmailDto.builder().mail(email.getMail()).build()).collect(Collectors.toSet());
     }
 
+    public UserDto mapUserEntityToUserDto(User user) {
+        return UserDto.builder()
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .emails(convertEmailsEntityToDto(user.getEmails()))
+                .phoneNumbers(convertPhoneNumbersEntityToDto(user.getPhoneNumbers()))
+                .build();
+    }
+
 }

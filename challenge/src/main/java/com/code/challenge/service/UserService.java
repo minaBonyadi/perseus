@@ -1,5 +1,6 @@
 package com.code.challenge.service;
 
+import com.code.challenge.component.UserManagement;
 import com.code.challenge.dto.EmailDto;
 import com.code.challenge.dto.PhoneNumberDto;
 import com.code.challenge.dto.UserDto;
@@ -15,142 +16,96 @@ import com.code.challenge.repository.PhoneNumberRepository;
 import com.code.challenge.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
 
 @Service
 @Slf4j
 @AllArgsConstructor
-public class UserService {
+public class UserService implements UserCrudHandler {
 
     private final UserRepository userRepository;
     private final EmailRepository emailRepository;
     private final PhoneNumberRepository phoneNumberRepository;
     private final Mapper mapper;
+    private final UserManagement userManagement;
 
-    public UserDto createUser(UserDto userDto){
+    /**
+     *
+     * @param userDto with their data
+     *  create a user and return userDto
+     */
+    public UserDto createUser(UserDto userDto) {
         if (userRepository.findByFirstNameAndLastNameIgnoreCase(userDto.getFirstName(), userDto.getLastName()).isPresent()) {
             throw new UserLogicalException("User is already exists!");
         }
-        Set<Email> emails = mapper.convertEmailsDtoToEntity(userDto);
-        Set<PhoneNumber> phoneNumbers = mapper.convertPhoneNumbersDtoToEntity(userDto);
+        User newUser = userManagement.getNewUser(userDto);
 
-        User newUser = User.builder()
-                    .firstName(userDto.getFirstName())
-                    .lastName(userDto.getLastName())
-                    .build();
-
-        emailRepository.saveAll(emails);
-        phoneNumberRepository.saveAll(phoneNumbers);
-
-        newUser.setEmails(emails);
-        newUser.setPhoneNumbers(phoneNumbers);
-
-        userRepository.save(newUser);
         log.info("A user by this first_name [{}] and last_name [{}] has just added successfully", userDto.getFirstName(), userDto.getLastName());
 
-        return UserDto.builder()
-                .id(newUser.getId())
-                .firstName(newUser.getFirstName())
-                .lastName(newUser.getLastName())
-                .emails(mapper.convertEmailsEntityToDto(newUser.getEmails()))
-                .phoneNumbers(mapper.convertPhoneNumbersEntityToDto(newUser.getPhoneNumbers()))
-                .build();
+        return mapper.mapUserEntityToUserDto(newUser);
     }
 
+    /**
+     *
+     * @param userId with long id
+     *  find a user and return it as a userDto
+     */
     public UserDto getUserById(long userId) {
         User user = userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("User Not Found!"));
 
-        return UserDto.builder()
-                .id(user.getId())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .emails(mapper.convertEmailsEntityToDto(user.getEmails()))
-                .phoneNumbers(mapper.convertPhoneNumbersEntityToDto(user.getPhoneNumbers()))
-                .build();
+        return mapper.mapUserEntityToUserDto(user);
     }
 
+    /**
+     *
+     * @param firstName string name
+     * @param lastName string last name
+     *  create or update an email, save it on db then send it to a service
+     */
     public UserDto getUserByName(String firstName, String lastName) {
         User user = userRepository.findByFirstNameAndLastNameIgnoreCase(firstName, lastName)
                 .orElseThrow(()-> new UserNotFoundException("User Not Found!"));
 
-        return UserDto.builder()
-                .id(user.getId())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .emails(mapper.convertEmailsEntityToDto(user.getEmails()))
-                .phoneNumbers(mapper.convertPhoneNumbersEntityToDto(user.getPhoneNumbers()))
-                .build();
+        return mapper.mapUserEntityToUserDto(user);
     }
 
+    /**
+     *
+     * @param id long
+     * @param emailDto with their data
+     *  add or update an email, save it on db then send it to a service
+     */
     public UserDto addOrUpdateUserMail(long id, EmailDto emailDto) {
 
         User user = userRepository.findById(id).orElseThrow(()-> new UserNotFoundException("User Not Found!"));
-        Set<Email> emails = new HashSet<>();
-        Email email = mapper.convertEmailsDtoToEntity(emailDto);
-
-        Optional<Email> updatedEmail = emailRepository.findEmailByMail(emailDto.getMail());
-
-        if (updatedEmail.isPresent()) {
-            updatedEmail.get().setMail(emailDto.getMail());
-            emailRepository.save(updatedEmail.get());
-        }else {
-            emailRepository.save(email);
-            emails.add(email);
-            emails.addAll(user.getEmails());
-            user.setEmails(emails);
-        }
-
-        User updatedUser = userRepository.save(user);
+        User updatedUser = userManagement.getUserByEmailDto(emailDto, user);
         log.info("A user by this first_name [{}] and last_name [{}] has just added/updated successfully", user.getFirstName(), user.getLastName());
 
-        return UserDto.builder()
-                .id(updatedUser.getId())
-                .firstName(updatedUser.getFirstName())
-                .lastName(updatedUser.getLastName())
-                .emails(mapper.convertEmailsEntityToDto(updatedUser.getEmails()))
-                .phoneNumbers(mapper.convertPhoneNumbersEntityToDto(updatedUser.getPhoneNumbers()))
-                .build();
+        return mapper.mapUserEntityToUserDto(updatedUser);
     }
 
-    public UserDto addOrUpdateUserPhoneNo(long id, PhoneNumberDto phoneNumberDto) {
+    /**
+     * @param userId long
+     * @param phoneNumberDto with their data
+     *  create or update an phone number, save it on db then send it to a service
+     */
+    public UserDto addOrUpdateUserPhoneNo(long userId, PhoneNumberDto phoneNumberDto) {
 
-        User user = userRepository.findById(id).orElseThrow(()-> new UserNotFoundException("User Not Found!"));
-        Set<PhoneNumber> phoneNumbers = new HashSet<>();
-        PhoneNumber newPhoneNumber = mapper.convertPhoneNumbersDtoToEntity(phoneNumberDto);
-
-        Optional<PhoneNumber> updatedPhoneNo = phoneNumberRepository.findPhoneNumberByNumber(phoneNumberDto.getNumber());
-
-        if (updatedPhoneNo.isPresent()) {
-            updatedPhoneNo.get().setNumber(phoneNumberDto.getNumber());
-            phoneNumberRepository.save(updatedPhoneNo.get());
-        }else {
-            phoneNumberRepository.save(newPhoneNumber);
-            phoneNumbers.add(newPhoneNumber);
-            phoneNumbers.addAll(user.getPhoneNumbers());
-            user.setPhoneNumbers(phoneNumbers);
-        }
-
-        User updatedUser = userRepository.save(user);
+        User user = userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("User Not Found!"));
+        User updatedUser = userManagement.getUserByPhoneNumber(phoneNumberDto, user);
 
         log.info("A user by this first_name [{}] and last_name [{}] has just updated successfully", user.getFirstName(), user.getLastName());
 
-        return UserDto.builder()
-                .id(updatedUser.getId())
-                .firstName(updatedUser.getFirstName())
-                .lastName(updatedUser.getLastName())
-                .emails(mapper.convertEmailsEntityToDto(updatedUser.getEmails()))
-                .phoneNumbers(mapper.convertPhoneNumbersEntityToDto(updatedUser.getPhoneNumbers()))
-                .build();
+        return mapper.mapUserEntityToUserDto(updatedUser);
     }
 
-    public RestResponse deleteUser(long id) {
-        User user = userRepository.findById(id).orElseThrow(()-> new UserNotFoundException("User Not Found!"));
+    /**
+     *
+     * @param userId with their data
+     *  create or update an email, save it on db then send it to a service
+     */
+    public RestResponse deleteUser(long userId) {
+        User user = userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("User Not Found!"));
 
         user.getEmails().forEach(Email::deleteEmails);
         user.getPhoneNumbers().forEach(PhoneNumber::deletePhoneNumber);
@@ -163,4 +118,5 @@ public class UserService {
 
         return new RestResponse(RestResponseType.SUCCESS, "deleting user done successfully!");
     }
+
 }
