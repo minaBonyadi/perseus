@@ -18,7 +18,17 @@ public class UserExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(value = {UserLogicalException.class})
-    protected ResponseEntity<RestResponse> handleOutOfBandException(UserLogicalException ex, WebRequest request) {
+    protected ResponseEntity<RestResponse> handleUserLogicalException(UserLogicalException ex, WebRequest request) {
         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new RestResponse(RestResponseType.ERROR, ex.getMessage()));
+    }
+
+    @ExceptionHandler(value = {EmailNotFoundException.class})
+    protected ResponseEntity<RestResponse> handleEmailNotFoundException(EmailNotFoundException ex, WebRequest request) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new RestResponse(RestResponseType.ERROR, ex.getMessage()));
+    }
+
+    @ExceptionHandler(value = {PhoneNumberNotFoundException.class})
+    protected ResponseEntity<RestResponse> handlePhoneNumberNotFoundException(PhoneNumberNotFoundException ex, WebRequest request) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new RestResponse(RestResponseType.ERROR, ex.getMessage()));
     }
 }
