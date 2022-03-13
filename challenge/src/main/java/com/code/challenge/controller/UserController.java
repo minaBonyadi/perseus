@@ -35,12 +35,12 @@ public class UserController {
         return new ResponseEntity<>(userService.getUserByName(firstName , lastName), HttpStatus.OK);
     }
 
-    @PutMapping(path = "/{id}/emails")
+    @PutMapping(path = "/{id}/email")
     public ResponseEntity<UserDto> addOrUpdateUserDataMail(@PathVariable long id, @Valid @RequestBody EmailDto emailDto){
         return new ResponseEntity<>(userService.addOrUpdateUserMail(id, emailDto), HttpStatus.OK);
     }
 
-    @PutMapping(path = "/{id}/phone-numbers")
+    @PutMapping(path = "/{id}/phone-number")
     public ResponseEntity<UserDto> addOrUpdateUserDataPhone(@PathVariable long id, @Valid @RequestBody PhoneNumberDto phoneNumberDto){
         return new ResponseEntity<>(userService.addOrUpdateUserPhoneNo(id, phoneNumberDto), HttpStatus.OK);
     }

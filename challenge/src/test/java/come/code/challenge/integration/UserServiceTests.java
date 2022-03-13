@@ -245,7 +245,7 @@ class UserServiceTests {
         //          WHEN
         //************************
 
-        UriTemplate requestTemplate = new UriTemplate("/users/{id}/emails");
+        UriTemplate requestTemplate = new UriTemplate("/users/{id}/email");
         Map<String, Long> uriVariables = new HashMap<>();
         uriVariables.put("id", id);
 
@@ -279,7 +279,7 @@ class UserServiceTests {
         //          WHEN
         //************************
 
-        UriTemplate requestTemplate = new UriTemplate("/users/{id}/phone-numbers");
+        UriTemplate requestTemplate = new UriTemplate("/users/{id}/phone-number");
         Map<String, Long> uriVariables = new HashMap<>();
         uriVariables.put("id", id);
 
@@ -313,7 +313,7 @@ class UserServiceTests {
         //          WHEN
         //************************
 
-        UriTemplate requestTemplate = new UriTemplate("/users/{id}/emails");
+        UriTemplate requestTemplate = new UriTemplate("/users/{id}/email");
         Map<String, Long> uriVariables = new HashMap<>();
         uriVariables.put("id", id);
 
@@ -347,7 +347,7 @@ class UserServiceTests {
         //          WHEN
         //************************
 
-        UriTemplate requestTemplate = new UriTemplate("/users/{id}/phone-numbers");
+        UriTemplate requestTemplate = new UriTemplate("/users/{id}/phone-number");
         Map<String, Long> uriVariables = new HashMap<>();
         uriVariables.put("id", id);
 
