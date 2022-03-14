@@ -1,6 +1,6 @@
 # mina bonyadi
 
-## User service application
+## User service Model
 
 ## Description
 This project is a user crud services including an Api.
@@ -72,7 +72,8 @@ all outputs are user dto except delete service
 
 ## Roadmap
 - add spring security
--add swagger UI
+- add swagger UI
+- unit test
 
 ## Authors and acknowledgment
 
